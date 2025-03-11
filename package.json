@@ -1,0 +1,25 @@
+{
+  "name": "connectorservicedarwin",
+  "version": "1.0.0",
+  "description": "Conector para bot de Telegram que procesa mensajes de gastos",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test-bot": "node test-bot.js",
+    "simple-bot": "node simple-bot.js",
+    "test:server": "node test-server.js",
+    "test:requests": "node test-requests.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "node-fetch": "^3.3.2",
+    "telegraf": "^4.16.3"
+  }
+}
