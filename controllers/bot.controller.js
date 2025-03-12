@@ -1,7 +1,7 @@
 export const handleStart = async (ctx) => {
   console.log('/start command received');
   try {
-    await ctx.telegram.sendMessage(ctx.message.chat.id, 'Hello! I am ready to process your messages.');
+    await ctx.telegram.sendMessage(ctx.message.chat.id, 'Hello! I am your expense tracking assistant. Send /help to see available commands.');
     console.log('Response to /start command sent');
   } catch (error) {
     console.error('Error responding to /start command:', error);
@@ -11,10 +11,76 @@ export const handleStart = async (ctx) => {
 export const handleHelp = async (ctx) => {
   console.log('/help command received');
   try {
-    await ctx.telegram.sendMessage(ctx.message.chat.id, 'Send me text messages and I will process them.');
+    await ctx.telegram.sendMessage(
+      ctx.message.chat.id, 
+      '🤖 Expense Bot - Available Commands:\n\n' +
+      'To register, send:\n' +
+      '"I want to register to the application"\n\n' +
+      'Once registered, you can:\n' +
+      '1. Record expenses by sending messages like:\n' +
+      '   - "Bought bread for $100"\n' +
+      '   - "Paid $30 for gas"\n' +
+      '   - "Taxi $20"\n\n' +
+      '2. Use /report to see your expenses from the last 24 hours'
+    );
     console.log('Response to /help command sent');
   } catch (error) {
     console.error('Error responding to /help command:', error);
+  }
+};
+
+export const handleReport = async (ctx) => {
+  console.log('/report command received');
+  try {
+    const message = "/report";
+    const telegramId = ctx.from.id.toString();
+    const chatId = ctx.message.chat.id;
+    const username = ctx.from.username || ctx.from.first_name || 'unknown';
+    
+    console.log('=== START REPORT PROCESSING ===');
+    console.log(`[1] Report requested by ${username} (${telegramId})`);
+    
+    // Send request to Bot Service
+    try {
+      let baseUrl = process.env.BOT_SERVICE_URL;
+      baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+      const processMessageUrl = baseUrl.includes('/api') 
+        ? `${baseUrl}/process-message` 
+        : `${baseUrl}/api/process-message`;
+      
+      const response = await fetch(processMessageUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          telegram_id: telegramId,
+          message: message
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Bot Service Error: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.should_respond && data.response_message) {
+        await ctx.telegram.sendMessage(chatId, data.response_message);
+        console.log(`Report sent to ${username}`);
+      } else {
+        console.log(`No report available or user not registered`);
+      }
+      
+    } catch (error) {
+      console.error(`Error getting report:`, error);
+      await ctx.telegram.sendMessage(chatId, 'Sorry, I could not generate your expense report right now. Please try again later.');
+    }
+    
+    console.log('=== END REPORT PROCESSING ===');
+    
+  } catch (error) {
+    console.error('Error in report handler:', error);
   }
 };
 
@@ -73,21 +139,19 @@ export const handleTextMessage = async (ctx) => {
       console.log(`[6] Response data:`, data);
       
       // Check if we should respond to the user
-      if (data.success && data.response_message) {
+      if (data.should_respond && data.response_message) {
         // Send the response message from the Bot Service
         await ctx.telegram.sendMessage(chatId, data.response_message);
         console.log(`[7] Response message sent to ${username}: "${data.response_message}"`);
-      } else if (!data.user_whitelisted) {
-        console.log(`[7] User not in whitelist. No response sent.`);
       } else {
-        console.log(`[7] No response message available.`);
+        console.log(`[7] No response needed.`);
       }
       
     } catch (error) {
       console.error(`[ERROR] Error communicating with Bot Service:`, error);
       
       // Send error message to user
-      await ctx.telegram.sendMessage(chatId, 'Sorry, I could not process your message at this time. Please try again later.');
+      await ctx.telegram.sendMessage(chatId, 'Sorry, I am having trouble processing your message right now. Please try again later.');
       console.log(`Error message sent to ${username}`);
     }
     
@@ -103,7 +167,7 @@ export const handleNonTextMessage = async (ctx) => {
   if (!ctx.message.text) {
     console.log('Received other type of message (non-text)');
     try {
-      await ctx.telegram.sendMessage(ctx.message.chat.id, 'I can only process text messages at this time.');
+      await ctx.telegram.sendMessage(ctx.message.chat.id, 'I can only process text messages. Please send your expenses as text.');
       console.log('Response to non-text message sent');
     } catch (error) {
       console.error('Error sending response to non-text message:', error);
