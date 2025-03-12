@@ -7,8 +7,6 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test-bot": "node test-bot.js",
-    "simple-bot": "node simple-bot.js",
     "test:server": "node test-server.js",
     "test:requests": "node test-requests.js",
     "test": "echo \"Error: no test specified\" && exit 1"

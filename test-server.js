@@ -1,5 +1,3 @@
-//TODO: Create a test server to test the Telegram bot and Python service
-
 import express from 'express';
 import dotenv from 'dotenv';
 
