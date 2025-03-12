@@ -1,6 +1,6 @@
 import express from 'express';
 import { PORT } from './config/bot.config.js';
-import { startBot, stopBot } from './services/bot.service.js';
+import { startBot, stopBot } from './bot.client.js';
 import apiRoutes from './routes/api.routes.js';
 
 // Initialize Express

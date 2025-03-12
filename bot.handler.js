@@ -52,6 +52,7 @@ export const handleReport = async (ctx) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': process.env.AUTH_KEY,
         },
         body: JSON.stringify({
           telegram_id: telegramId,
@@ -125,6 +126,7 @@ export const handleTextMessage = async (ctx) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': process.env.AUTH_KEY,
         },
         body: JSON.stringify(requestBody),
       });

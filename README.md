@@ -52,13 +52,15 @@ cp .env.example .env
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 BOT_SERVICE_URL=http://localhost:5000
 PORT=3000
+AUTH_KEY=your_auth_key
 ```
 
 ## Features
 
 ### Bot Commands
 - `/start`: Initiates the conversation with the bot
-- `/help`: Shows available commands
+- `/help`: Shows available commands and usage instructions
+- `/report`: Shows a summary of expenses recorded in the last 24 hours
 
 ### API Endpoints
 - `GET /`: Root endpoint that confirms the service is running
@@ -71,6 +73,12 @@ PORT=3000
 - Bot Service communication
 - Bot status verification
 - Graceful shutdown
+- API Authentication
+- Daily expense reporting
+
+## Authentication
+
+All requests to the Bot Service include an `Authorization` header with the value matching the `AUTH_KEY` environment variable. This ensures that only authorized services can communicate with the Bot Service.
 
 ## Development
 
@@ -98,6 +106,7 @@ The service includes error handling for:
 - Environment variables for sensitive data
 - Incoming message validation
 - Secure token and credential handling
+- API authentication with the Bot Service
 
 ## Contributing
 1. Fork the repository
@@ -182,15 +191,23 @@ curl http://localhost:5000/health
 # Send a message (whitelisted user)
 curl -X POST http://localhost:5000/api/process-message \
   -H "Content-Type: application/json" \
+  -H "Authorization: your_auth_key" \
   -d "{\"telegram_id\":\"123456789\",\"message\":\"hello\"}"
 
 # Send a message (non-whitelisted user)
 curl -X POST http://localhost:5000/api/process-message \
   -H "Content-Type: application/json" \
+  -H "Authorization: your_auth_key" \
   -d "{\"telegram_id\":\"987654321\",\"message\":\"hello\"}"
+
+# Request a daily report (whitelisted user)
+curl -X POST http://localhost:5000/api/process-message \
+  -H "Content-Type: application/json" \
+  -H "Authorization: your_auth_key" \
+  -d "{\"telegram_id\":\"123456789\",\"message\":\"/report\"}"
 ```
 
 Note: For Windows PowerShell, use this format for POST requests:
 ```powershell
-curl -X POST http://localhost:5000/api/process-message -H "Content-Type: application/json" -d "{\"telegram_id\":\"123456789\",\"message\":\"hello\"}"
+curl -X POST http://localhost:5000/api/process-message -H "Content-Type: application/json" -H "Authorization: your_auth_key" -d "{\"telegram_id\":\"123456789\",\"message\":\"hello\"}"
 ``` 

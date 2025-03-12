@@ -1,6 +1,6 @@
 import { Telegraf } from 'telegraf';
-import { BOT_TOKEN } from '../config/bot.config.js';
-import { handleStart, handleHelp, handleReport, handleTextMessage, handleNonTextMessage } from '../controllers/bot.controller.js';
+import { BOT_TOKEN } from './config/bot.config.js';
+import { handleStart, handleHelp, handleReport, handleTextMessage, handleNonTextMessage } from './bot.handler.js';
 
 // Initialize Telegram bot
 export const bot = new Telegraf(BOT_TOKEN);
